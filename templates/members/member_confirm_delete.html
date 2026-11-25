@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Archive Member{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm" style="max-width: 560px;">
+    <div class="card-body p-4">
+        <h4 class="fw-bold text-danger mb-2">Archive Member Record</h4>
+        <p class="text-muted">
+            This performs a <strong>soft delete</strong> (<code>is_active = False</code>) for <strong>{{ member.full_name }}</strong> ({{ member.member_number }}), preserving historical attendance and audit integrity.
+        </p>
+        <form method="post" class="d-flex gap-2 mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirm Archive</button>
+            <a href="{% url 'members:detail' member.member_id %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

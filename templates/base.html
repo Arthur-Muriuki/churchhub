@@ -90,6 +90,13 @@
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard
                 </a>
             </li>
+            {% if request.user|has_perm:"members.view" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'members' %}active{% endif %}" href="{% url 'members:list' %}">
+                    <i class="bi bi-people me-2"></i> Members
+                </a>
+            </li>
+            {% endif %}
 
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load rbac_tags %}
+{% block title %}{{ member.full_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">{{ member.full_name }}</h3>
+        <span class="badge bg-secondary">{{ member.member_number }}</span>
+        <span class="badge bg-primary">{{ member.get_membership_status_display }}</span>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'members:list' %}" class="btn btn-outline-secondary">Back to Directory</a>
+        {% if request.user|has_perm:"members.change" %}
+            <a href="{% url 'members:update' member.member_id %}" class="btn btn-primary">Edit Profile</a>
+        {% endif %}
+        {% if request.user|has_perm:"members.deactivate" and member.is_active %}
+            <a href="{% url 'members:delete' member.member_id %}" class="btn btn-outline-danger">Archive</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold">Demographics & Membership</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Gender</dt>
+                    <dd class="col-sm-7">{{ member.get_gender_display }}</dd>
+                    <dt class="col-sm-5">Date of Birth</dt>
+                    <dd class="col-sm-7">{{ member.date_of_birth|default:"-" }}</dd>
+                    <dt class="col-sm-5">Marital Status</dt>
+                    <dd class="col-sm-7">{{ member.get_marital_status_display }}</dd>
+                    <dt class="col-sm-5">Date Joined</dt>
+                    <dd class="col-sm-7">{{ member.date_joined }}</dd>
+                    <dt class="col-sm-5">Baptized</dt>
+                    <dd class="col-sm-7">{% if member.is_baptized %}Yes ({{ member.baptism_date }}){% else %}No{% endif %}</dd>
+                    <dt class="col-sm-5">Data Consent</dt>
+                    <dd class="col-sm-7">{% if member.consent_given %}Granted ({{ member.consent_timestamp|date:"Y-m-d H:i" }}){% else %}Not Recorded{% endif %}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold">Contact & Emergency Details</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Phone</dt>
+                    <dd class="col-sm-7">{{ member.phone_number|default:"-" }}</dd>
+                    <dt class="col-sm-5">Email</dt>
+                    <dd class="col-sm-7">{{ member.email|default:"-" }}</dd>
+                    <dt class="col-sm-5">Residence</dt>
+                    <dd class="col-sm-7">{{ member.residential_area|default:"-" }}</dd>
+                    <dt class="col-sm-5">Postal Address</dt>
+                    <dd class="col-sm-7">{{ member.postal_address|default:"-" }}</dd>
+                    <dt class="col-sm-5">Emergency Contact</dt>
+                    <dd class="col-sm-7">{{ member.emergency_contact_name|default:"-" }} {% if member.emergency_contact_phone %}({{ member.emergency_contact_phone }}){% endif %}</dd>
+                    <dt class="col-sm-5">Transfer Notes</dt>
+                    <dd class="col-sm-7">{{ member.transfer_notes|default:"-" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
