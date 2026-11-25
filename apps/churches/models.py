@@ -1,4 +1,5 @@
 import uuid
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -13,7 +14,29 @@ class ChurchProfile(models.Model):
     short_name = models.CharField(max_length=50, default="ChurchHub", help_text="Displayed in sidebar header")
     denomination = models.CharField(max_length=150, blank=True)
     motto = models.CharField(max_length=255, blank=True)
-
+    hex_color_validator = RegexValidator(
+    regex=r"^#[0-9A-Fa-f]{6}$",
+    message="Enter a valid 6-digit hex color code (e.g., #0A2540).",
+)
+# Configurable UI Theme Colors (Defaults to SRS Navy Blue #0A2540)
+    primary_color = models.CharField(
+        max_length=7,
+        default="#0A2540",
+        validators=[hex_color_validator],
+        help_text="Main navigation, sidebar, and primary buttons.",
+    )
+    secondary_color = models.CharField(
+        max_length=7,
+        default="#1E293B",
+        validators=[hex_color_validator],
+        help_text="Sidebar hover states and secondary headers.",
+    )
+    accent_color = models.CharField(
+        max_length=7,
+        default="#2563EB",
+        validators=[hex_color_validator],
+        help_text="Active links, badges, and highlights.",
+    )
     # Branding & Certificate Assets
     logo = models.ImageField(upload_to="church_branding/", blank=True, null=True)
     official_stamp_or_signature = models.ImageField(

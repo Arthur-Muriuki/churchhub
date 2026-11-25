@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | {{ church_config.name|default:"ChurchHub" }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ch-primary: {{ church_config.primary_color|default:"#0A2540" }};
+        }
+        body {
+            background-color: var(--ch-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary {
+            background-color: var(--ch-primary);
+            border-color: var(--ch-primary);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        {% if church_config.logo %}
+                            <img src="{{ church_config.logo.url }}" alt="Church Logo" height="64" class="mb-3 rounded">
+                        {% endif %}
+                        <h4 class="fw-bold mb-1">{{ church_config.name|default:"ChurchHub" }}</h4>
+                        {% if church_config.motto %}
+                            <p class="text-muted small fst-italic mb-0">"{{ church_config.motto }}"</p>
+                        {% else %}
+                            <p class="text-muted small mb-0">Secure Digital Operations Portal</p>
+                        {% endif %}
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger py-2 small">
+                            Invalid username or password. Please try again.
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Username</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Password</label>
+                            {{ form.password }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Sign In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

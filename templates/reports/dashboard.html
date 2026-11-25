@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Overview Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="fw-bold text-church-primary mb-1">{{ church_config.name }}</h4>
+                <p class="text-muted mb-3">{{ church_config.motto|default:"Centralized Church Digital Operations System" }}</p>
+                <div class="bg-light p-3 rounded border">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-calendar-week me-2"></i>Service Schedule</h6>
+                    <pre class="mb-0 font-sans" style="white-space: pre-wrap; font-family: inherit;">{{ church_config.service_schedule }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Church Profile & System Settings{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Church Profile & System Settings</h3>
+        <p class="text-muted mb-0">Configure church identity, branding colors, certificates, and data privacy policies.</p>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-4">
+        <!-- Church Identity & Theme Colors -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-bold py-3">1. Identity & Theme Appearance</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Official Church Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Short Name (Sidebar)</label>
+                            {{ form.short_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Denomination</label>
+                            {{ form.denomination }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Church Motto / Theme</label>
+                        {{ form.motto }}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Church Logo</label>
+                            {{ form.logo }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Official Stamp / Signature</label>
+                            {{ form.official_stamp_or_signature }}
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label fw-bold mb-0">Theme Colors</label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetThemeColors()">
+                            Reset to Default Navy
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <label class="form-label small text-muted">Primary</label>
+                            {{ form.primary_color }}
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted">Secondary</label>
+                            {{ form.secondary_color }}
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted">Accent</label>
+                            {{ form.accent_color }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact, Schedule & Signatories -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-bold py-3">2. Contact, Schedule & Signatories</div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Official Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Physical Location</label>
+                            {{ form.physical_address }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Postal Address</label>
+                            {{ form.postal_address }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Website</label>
+                        {{ form.website }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Weekly Service Schedule</label>
+                        {{ form.service_schedule }}
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Senior Pastor Name</label>
+                            {{ form.senior_pastor_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Church Secretary Name</label>
+                            {{ form.church_secretary_name }}
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Certificate Footer Note</label>
+                        {{ form.certificate_footer_note }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy & Data Protection Governance -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold py-3">3. Privacy Policy & Kenya Data Protection Act (2019) Controls</div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-2">
+                        {{ form.enable_confidential_pastoral_notes }}
+                        <label class="form-check-label fw-semibold">Enable Encrypted Pastoral Counselling Notes Module</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.require_registration_consent }}
+                        <label class="form-check-label fw-semibold">Require Explicit Member Consent During Registration</label>
+                    </div>
+                    <div>
+                        <label class="form-label fw-semibold">Church Data Privacy Notice</label>
+                        {{ form.data_privacy_statement }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+            <i class="bi bi-check-circle me-2"></i> Save Church Configuration
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function resetThemeColors() {
+        document.getElementById("id_primary_color").value = "#0A2540";
+        document.getElementById("id_secondary_color").value = "#1E293B";
+        document.getElementById("id_accent_color").value = "#2563EB";
+    }
+</script>
+{% endblock %}
