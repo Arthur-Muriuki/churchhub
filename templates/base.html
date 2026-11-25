@@ -145,6 +145,13 @@
                 </a>
             </li>
             {% endif %}
+            {% if request.user|has_perm:"announcements.view" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'announcements' %}active{% endif %}" href="{% url 'announcements:list' %}">
+                    <i class="bi bi-megaphone me-2"></i> Announcements
+                </a>
+            </li>
+            {% endif %}
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}
             <li class="nav-item">

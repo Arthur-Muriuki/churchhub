@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "create" %}Post Announcement{% else %}Edit Announcement{% endif %}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">{% if mode == "create" %}Post New Announcement{% else %}Update Announcement{% endif %}</h3>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width: 780px;">
+    <div class="card-body p-4">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Title *</label>
+                    {{ form.title }}
+                    {{ form.title.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Category *</label>
+                    {{ form.category }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Priority *</label>
+                    {{ form.priority }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Publish Date *</label>
+                    {{ form.publish_date }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Expiration Date (Optional)</label>
+                    {{ form.expires_on }}
+                    {{ form.expires_on.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Target Department (Optional)</label>
+                    {{ form.target_department }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Target Ministry (Optional)</label>
+                    {{ form.target_ministry }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Message Body *</label>
+                    {{ form.body }}
+                    {{ form.body.errors }}
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check">
+                        {{ form.is_pinned }}
+                        <label class="form-check-label fw-semibold">Pin to Top of Board</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check">
+                        {{ form.is_published }}
+                        <label class="form-check-label fw-semibold">Publish Immediately</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save Announcement</button>
+                <a href="{% url 'announcements:list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

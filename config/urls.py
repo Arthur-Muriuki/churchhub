@@ -15,7 +15,8 @@ urlpatterns = [
     path("attendance/", include("attendance.urls")),
     path("visitors/", include("visitors.urls")),
     path("pastoral/", include("pastoral.urls")),
-    path("", include("reports.urls")),
+    path("reports/", include("reports.urls")),
+    path("announcements/", include("announcements.urls")),
 ]
 
 if settings.DEBUG:
