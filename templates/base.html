@@ -97,6 +97,19 @@
                 </a>
             </li>
             {% endif %}
+            {% if request.user|has_perm:"departments.view" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'departments' %}active{% endif %}" href="{% url 'departments:list' %}">
+                    <i class="bi bi-diagram-3 me-2"></i> Departments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'ministries' %}active{% endif %}" href="{% url 'ministries:list' %}">
+                    <i class="bi bi-collection me-2"></i> Ministries
+                </a>
+            </li>
+            
+            {% endif %}
 
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}

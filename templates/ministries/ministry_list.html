@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load rbac_tags %}
+{% block title %}Ministries & Activities{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Ministries & Activities</h3>
+        <p class="text-muted mb-0">Coordinate specialized ministries, schedules, and activity logs.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if request.user|has_perm:"departments.manage_own" %}
+            <a href="{% url 'ministries:activity_create' %}" class="btn btn-outline-primary">
+                <i class="bi bi-journal-plus me-1"></i> Log Activity
+            </a>
+        {% endif %}
+        {% if request.user|has_perm:"departments.manage" %}
+            <a href="{% url 'ministries:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> New Ministry
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    {% for m in ministries %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-1">{{ m.name }}</h5>
+                <div class="small text-muted mb-2">
+                    Department: <strong>{{ m.department.name|default:"General" }}</strong>
+                </div>
+                <p class="small text-muted">{{ m.description|default:"No description." }}</p>
+                <div class="small"><strong>Leader:</strong> {{ m.leader.get_full_name|default:m.leader.username|default:"Unassigned" }}</div>
+                <div class="small"><strong>Schedule:</strong> {{ m.meeting_schedule|default:"TBD" }}</div>
+                <div class="small text-muted mt-1"><strong>Members:</strong> {{ m.members.count }}</div>
+            </div>
+            {% if request.user|has_perm:"departments.manage" %}
+            <div class="card-footer bg-white border-0 pt-0">
+                <a href="{% url 'ministries:update' m.id %}" class="btn btn-sm btn-outline-secondary">Edit Ministry</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-4 text-muted">No ministries created yet.</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold">Recent Ministry Activities</div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Ministry</th>
+                    <th>Activity</th>
+                    <th>Location</th>
+                    <th>Attendance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for act in activities %}
+                <tr>
+                    <td>{{ act.activity_date }}</td>
+                    <td class="fw-semibold">{{ act.ministry.name }}</td>
+                    <td>{{ act.title }}</td>
+                    <td>{{ act.location|default:"-" }}</td>
+                    <td>{{ act.attendance_count }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No ministry activities logged yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
