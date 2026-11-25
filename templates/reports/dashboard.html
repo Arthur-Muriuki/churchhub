@@ -1,19 +1,171 @@
 {% extends "base.html" %}
-{% block title %}Overview Dashboard{% endblock %}
+{% load rbac_tags %}
+{% block title %}Executive Dashboard{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h4 class="fw-bold text-church-primary mb-1">{{ church_config.name }}</h4>
-                <p class="text-muted mb-3">{{ church_config.motto|default:"Centralized Church Digital Operations System" }}</p>
-                <div class="bg-light p-3 rounded border">
-                    <h6 class="fw-bold mb-2"><i class="bi bi-calendar-week me-2"></i>Service Schedule</h6>
-                    <pre class="mb-0 font-sans" style="white-space: pre-wrap; font-family: inherit;">{{ church_config.service_schedule }}</pre>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">{{ church_config.name }}</h3>
+        <p class="text-muted mb-0">{{ church_config.motto|default:"Centralized Church Operations Overview & Analytics" }}</p>
+    </div>
+    {% if request.user|has_perm:"reports.view_dashboard" %}
+        <a href="{% url 'reports:center' %}" class="btn btn-primary">
+            <i class="bi bi-bar-chart-line me-1"></i> Reports &amp; Exports
+        </a>
+    {% endif %}
+</div>
+
+<!-- KPI Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Total Active Members</div>
+                <div class="fs-2 fw-bold text-church-primary mt-1">{{ total_members }}</div>
+                <div class="small text-muted">{{ active_status_members }} active status &bull; +{{ new_members_this_month }} this month</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Recent Avg. Attendance</div>
+                <div class="fs-2 fw-bold text-church-primary mt-1">{{ avg_attendance }}</div>
+                <div class="small text-muted">Across last {{ recent_events|length }} recorded events</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Baptized &amp; Certificates</div>
+                <div class="fs-2 fw-bold text-church-primary mt-1">{{ baptized_count }}</div>
+                <div class="small text-muted">{{ total_baptisms }} verified baptism records</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small fw-semibold text-uppercase">Open Visitor Follow-Ups</div>
+                <div class="fs-2 fw-bold text-church-primary mt-1">{{ open_visitors }}</div>
+                <div class="small text-muted">
+                    {% if request.user|has_perm:"pastoral.view_confidential" and church_config.enable_confidential_pastoral_notes %}
+                        {{ active_pastoral_cases }} active pastoral cases
+                    {% else %}
+                        Follow-up care active
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Chart.js Visual Analytics -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold py-3">Recent Event Attendance Trend</div>
+            <div class="card-body">
+                <canvas id="attendanceChart" height="130"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold py-3">Department Roster Distribution</div>
+            <div class="card-body">
+                <canvas id="departmentChart" height="170"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service Schedule & Recent Events -->
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold py-3">Weekly Service Schedule</div>
+            <div class="card-body">
+                <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit;">{{ church_config.service_schedule }}</pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold py-3">Latest Events</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Event</th>
+                            <th class="text-end">Total Attendance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ev in recent_events|slice:":5" %}
+                        <tr>
+                            <td>{{ ev.event_date }}</td>
+                            <td class="fw-semibold">{{ ev.title }}</td>
+                            <td class="text-end"><span class="badge bg-primary">{{ ev.total_attendance }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No events recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue("--ch-primary").trim() || "#0A2540";
+    const accentColor = getComputedStyle(document.documentElement).getPropertyValue("--ch-accent").trim() || "#2563EB";
+
+    const eventLabels = {{ event_labels_json|safe }};
+    const eventTotals = {{ event_totals_json|safe }};
+
+    new Chart(document.getElementById("attendanceChart"), {
+        type: "bar",
+        data: {
+            labels: eventLabels.length ? eventLabels : ["No Events Yet"],
+            datasets: [{
+                label: "Total Attendance",
+                data: eventLabels.length ? eventTotals : [0],
+                backgroundColor: primaryColor,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    const deptLabels = {{ dept_labels_json|safe }};
+    const deptCounts = {{ dept_counts_json|safe }};
+
+    new Chart(document.getElementById("departmentChart"), {
+        type: "doughnut",
+        data: {
+            labels: deptLabels.length ? deptLabels : ["No Departments"],
+            datasets: [{
+                data: deptLabels.length ? deptCounts : [1],
+                backgroundColor: [primaryColor, accentColor, "#22C55E", "#F59E0B", "#8B5CF6", "#EC4899"]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+</script>
 {% endblock %}

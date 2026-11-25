@@ -138,7 +138,13 @@
                 </a>
             </li>
             {% endif %}
-
+            {% if request.user|has_perm:"reports.view_dashboard" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'reports' and request.resolver_match.url_name == 'center' %}active{% endif %}" href="{% url 'reports:center' %}">
+                    <i class="bi bi-bar-chart-line me-2"></i> Reports &amp; Exports
+                </a>
+            </li>
+            {% endif %}
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}
             <li class="nav-item">
