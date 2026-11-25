@@ -124,6 +124,20 @@
                 </a>
             </li>
             {% endif %}
+            {% if request.user|has_perm:"visitors.view" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'visitors' %}active{% endif %}" href="{% url 'visitors:list' %}">
+                    <i class="bi bi-person-heart me-2"></i> Visitors & Follow-Up
+                </a>
+            </li>
+            {% endif %}
+            {% if request.user|has_perm:"pastoral.view_confidential" and church_config.enable_confidential_pastoral_notes %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'pastoral' %}active{% endif %}" href="{% url 'pastoral:list' %}">
+                    <i class="bi bi-shield-check me-2"></i> Pastoral Care
+                </a>
+            </li>
+            {% endif %}
 
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}

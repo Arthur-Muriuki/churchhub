@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "create" %}Register Visitor{% else %}Edit Visitor{% endif %}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">{% if mode == "create" %}Register Visitor{% else %}Update Visitor{% endif %}</h3>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width: 780px;">
+    <div class="card-body p-4">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Full Name *</label>
+                    {{ form.full_name }}
+                    {{ form.full_name.errors }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Visit Date *</label>
+                    {{ form.visit_date }}
+                    {{ form.visit_date.errors }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Email</label>
+                    {{ form.email }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Residential Area</label>
+                    {{ form.residential_area }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Attended Event</label>
+                    {{ form.visited_event }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">How They Heard</label>
+                    {{ form.how_heard }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Follow-Up Status</label>
+                    {{ form.status }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Assigned Follow-Up Leader / Staff</label>
+                    {{ form.assigned_to }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Next Follow-Up Date</label>
+                    {{ form.next_followup_date }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Prayer Requests / Welcome Notes</label>
+                    {{ form.prayer_or_notes }}
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save Visitor</button>
+                <a href="{% url 'visitors:list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

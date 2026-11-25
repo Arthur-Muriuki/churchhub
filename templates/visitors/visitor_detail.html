@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load rbac_tags %}
+{% block title %}{{ visitor.full_name }} - Follow-Up{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">{{ visitor.full_name }}</h3>
+        <span class="badge bg-secondary">{{ visitor.get_status_display }}</span>
+        <span class="text-muted ms-2">Visited: {{ visitor.visit_date }}</span>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'visitors:list' %}" class="btn btn-outline-secondary">Back to Visitors</a>
+        {% if request.user|has_perm:"visitors.manage" %}
+            <a href="{% url 'visitors:update' visitor.id %}" class="btn btn-outline-primary">Edit Visitor</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-bold">Visitor Details</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Phone</dt>
+                    <dd class="col-sm-7">{{ visitor.phone_number|default:"-" }}</dd>
+                    <dt class="col-sm-5">Email</dt>
+                    <dd class="col-sm-7">{{ visitor.email|default:"-" }}</dd>
+                    <dt class="col-sm-5">Residence</dt>
+                    <dd class="col-sm-7">{{ visitor.residential_area|default:"-" }}</dd>
+                    <dt class="col-sm-5">Assigned To</dt>
+                    <dd class="col-sm-7">{{ visitor.assigned_to.get_full_name|default:visitor.assigned_to.username|default:"Unassigned" }}</dd>
+                    <dt class="col-sm-5">Next Follow-Up</dt>
+                    <dd class="col-sm-7">{{ visitor.next_followup_date|default:"-" }}</dd>
+                    <dt class="col-sm-5">Notes / Prayer</dt>
+                    <dd class="col-sm-7">{{ visitor.prayer_or_notes|default:"-" }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        {% if request.user|has_perm:"visitors.manage" %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold">Log Follow-Up Activity</div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Contact Date *</label>
+                        {{ followup_form.contact_date }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Channel *</label>
+                        {{ followup_form.channel }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Next Action Date</label>
+                        {{ followup_form.next_action_date }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Follow-Up Summary *</label>
+                        {{ followup_form.summary }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Follow-Up</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold">Follow-Up History</div>
+            <div class="list-group list-group-flush">
+                {% for f in followups %}
+                <div class="list-group-item p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-semibold">{{ f.get_channel_display }}</span>
+                        <span class="badge bg-light text-dark border">{{ f.contact_date }}</span>
+                    </div>
+                    <p class="mb-1">{{ f.summary }}</p>
+                    <small class="text-muted">
+                        Recorded by {{ f.recorded_by.get_full_name|default:f.recorded_by.username|default:"System" }}
+                        {% if f.next_action_date %}&bull; Next action: {{ f.next_action_date }}{% endif %}
+                    </small>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-center py-4 text-muted">No follow-up activities recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

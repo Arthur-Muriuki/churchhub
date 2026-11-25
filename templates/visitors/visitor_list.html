@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load rbac_tags %}
+{% block title %}Visitors & Follow-Up{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Visitors & Follow-Up</h3>
+        <p class="text-muted mb-0">Track church visitors, assign follow-up care, and monitor integration status.</p>
+    </div>
+    {% if request.user|has_perm:"visitors.manage" %}
+        <a href="{% url 'visitors:create' %}" class="btn btn-primary">
+            <i class="bi bi-person-plus me-1"></i> Register Visitor
+        </a>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-6">
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search visitor name, phone, email, or area...">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select">
+                    <option value="">All Follow-Up Statuses</option>
+                    {% for code, label in status_choices %}
+                        <option value="{{ code }}" {% if status_filter == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Visitor</th>
+                    <th>Visit Date</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Next Follow-Up</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in visitors %}
+                <tr>
+                    <td class="fw-semibold">
+                        <a href="{% url 'visitors:detail' v.id %}" class="text-decoration-none text-dark">{{ v.full_name }}</a>
+                    </td>
+                    <td>{{ v.visit_date }}</td>
+                    <td>{{ v.phone_number|default:"-" }}</td>
+                    <td><span class="badge bg-secondary">{{ v.get_status_display }}</span></td>
+                    <td>{{ v.assigned_to.get_full_name|default:v.assigned_to.username|default:"Unassigned" }}</td>
+                    <td>{{ v.next_followup_date|default:"-" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'visitors:detail' v.id %}" class="btn btn-sm btn-outline-primary">Follow-Up</a>
+                        {% if request.user|has_perm:"visitors.manage" %}
+                            <a href="{% url 'visitors:update' v.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">No visitor records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
