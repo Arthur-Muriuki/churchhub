@@ -110,6 +110,13 @@
             </li>
             
             {% endif %}
+            {% if request.user|has_perm:"baptism.view" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'baptism' %}active{% endif %}" href="{% url 'baptism:list' %}">
+                    <i class="bi bi-award me-2"></i> Baptism & Certificates
+                </a>
+            </li>
+            {% endif %}
 
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}
