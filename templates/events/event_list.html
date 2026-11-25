@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load rbac_tags %}
+{% block title %}Events & Services{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Events & Services</h3>
+        <p class="text-muted mb-0">Schedule services, meetings, and events, and record attendance rosters.</p>
+    </div>
+    {% if request.user|has_perm:"events.manage" %}
+        <a href="{% url 'events:create' %}" class="btn btn-primary">
+            <i class="bi bi-calendar-plus me-1"></i> Schedule Event
+        </a>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-6">
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by event title, venue, department, or ministry...">
+            </div>
+            <div class="col-md-4">
+                <select name="type" class="form-select">
+                    <option value="">All Event Types</option>
+                    {% for code, label in type_choices %}
+                        <option value="{{ code }}" {% if event_type == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Type</th>
+                    <th>Venue</th>
+                    <th>Total Attendance</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ev in events %}
+                <tr>
+                    <td class="fw-semibold">{{ ev.event_date }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ ev.title }}</div>
+                        {% if ev.department or ev.ministry %}
+                            <div class="small text-muted">
+                                {{ ev.department.name|default:"" }}{% if ev.department and ev.ministry %} / {% endif %}{{ ev.ministry.name|default:"" }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge bg-light text-dark border">{{ ev.get_event_type_display }}</span></td>
+                    <td>{{ ev.location|default:"-" }}</td>
+                    <td>
+                        <span class="badge bg-primary fs-6">{{ ev.total_attendance }}</span>
+                        <div class="small text-muted">{{ ev.present_members_count }} members + {{ ev.additional_headcount }} extra</div>
+                    </td>
+                    <td class="text-end">
+                        {% if request.user|has_perm:"attendance.record" %}
+                            <a href="{% url 'attendance:mark' ev.id %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-check2-square me-1"></i> Attendance
+                            </a>
+                        {% endif %}
+                        {% if request.user|has_perm:"events.manage" %}
+                            <a href="{% url 'events:update' ev.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No church events scheduled yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

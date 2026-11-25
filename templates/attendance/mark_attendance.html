@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Attendance - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Attendance: {{ event.title }}</h3>
+        <p class="text-muted mb-0">
+            {{ event.event_date }} &bull; {{ event.get_event_type_display }} &bull;
+            <strong>Total Attendance: {{ event.total_attendance }}</strong>
+        </p>
+    </div>
+    <a href="{% url 'events:list' %}" class="btn btn-outline-secondary">Back to Events</a>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white fw-bold">Headcount & Individual Member Roster</div>
+        <div class="card-body border-bottom bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold mb-1">{{ form.additional_headcount.label }}</label>
+                    {{ form.additional_headcount }}
+                </div>
+                <div class="col-md-7 text-muted small pt-3 pt-md-0">
+                    Total Attendance automatically combines <strong>Present Members</strong> ({{ event.present_members_count }}) + <strong>Additional Headcount</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Member</th>
+                        <th>Member ID</th>
+                        <th style="width: 190px;">Attendance Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in form.iter_member_rows %}
+                    <tr>
+                        <td class="fw-semibold">{{ row.member.full_name }}</td>
+                        <td class="text-muted">{{ row.member.member_number }}</td>
+                        <td>{{ row.status_field }}</td>
+                        <td>{{ row.note_field }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">No active members available to mark.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'events:list' %}" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary px-4">Save Attendance</button>
+    </div>
+</form>
+{% endblock %}

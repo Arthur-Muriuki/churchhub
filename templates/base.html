@@ -117,6 +117,13 @@
                 </a>
             </li>
             {% endif %}
+            {% if request.user|has_perm:"events.view" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'events' or request.resolver_match.app_name == 'attendance' %}active{% endif %}" href="{% url 'events:list' %}">
+                    <i class="bi bi-calendar-check me-2"></i> Events & Attendance
+                </a>
+            </li>
+            {% endif %}
 
             <div class="sidebar-heading">Administration</div>
             {% if request.user|has_perm:"churches.manage_settings" %}
